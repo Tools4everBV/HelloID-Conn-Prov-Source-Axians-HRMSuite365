@@ -159,7 +159,7 @@ function Invoke-MercashFuncGetPageData {
             ContentType = 'text/xml; charset=utf-8'
             Body        = $soapBody
         }
-        # 
+
         [xml]$response = Invoke-RestMethod @requestParameters
 
         [xml]$responseObject = $response.Envelope.Body.FuncGetPageData_Result.parXMLData
@@ -252,7 +252,7 @@ try {
     $splatParmGetFormation = @{
         webPage          = 'EXT_FORM'
         FieldTranslation = $translationFormationMapping
-        # employeeNr       = '0250'
+        # employeeNr       = '1234' # Debug 1 person
     }      
         
     $formationsUnfiltered = Invoke-MercashFuncGetPageData @splatParmGetFormation
@@ -268,7 +268,7 @@ try {
     $formationsUnfiltered = $null
     $formationsFiltered = $null
 
-
+    
     $actionMessage = "enhancing and exporting person objects to HelloID"
     $persons | Add-Member -MemberType NoteProperty -Name "ExternalId" -Value $null -Force
     $persons | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value $null -Force
