@@ -21,7 +21,7 @@
             "mode": "field",
             "value": "Person_Mail_Private_15",
             "validation": {
-                "required": true
+                "required": false
             }
         },
         {
@@ -101,7 +101,7 @@
             "mode": "field",
             "value": "Person_Initials_5",
             "validation": {
-                "required": true
+                "required": false
             }
         },
         {
