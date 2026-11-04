@@ -1,0 +1,238 @@
+{
+    "personMappings": [
+        {
+            "name": "Contact.Business.Email",
+            "mode": "field",
+            "value": "Person_Mail_Work_50",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Contact.Business.Phone.Mobile",
+            "mode": "field",
+            "value": "Person_Mobile_Work_11020767",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Contact.Personal.Email",
+            "mode": "field",
+            "value": "Person_Mail_Private_15",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Contact.Personal.Phone.Mobile",
+            "mode": "field",
+            "value": "Person_Mobile_Private_14",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "ExternalId",
+            "mode": "field",
+            "value": "ExternalId",
+            "validation": {
+                "required": true
+            }
+        },
+        {
+            "name": "Location.ExternalId",
+            "mode": "field",
+            "value": "Component_VESTIGING",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Location.Name",
+            "mode": "field",
+            "value": "Component_VESTIGING2",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Name.Convention",
+            "mode": "complex",
+            "value": "switch (source.Person_Convention_11020715) {\r\n    case \"0\": {\r\n        \"B\"\r\n        break;\r\n    }\r\n    case \"1\": {\r\n        \"P\"\r\n        break;\r\n    }\r\n    case \"2\": {\r\n        \"BP\"\r\n        break;\r\n    }\r\n    case \"3\": {\r\n        \"PB\"\r\n        break;\r\n    }\r\n    default: {\r\n        \"B\"\r\n    }\r\n}",
+            "validation": {
+                "required": true
+            }
+        },
+        {
+            "name": "Name.FamilyName",
+            "mode": "field",
+            "value": "Person_LastName_11020721",
+            "validation": {
+                "required": true
+            }
+        },
+        {
+            "name": "Name.FamilyNamePartner",
+            "mode": "field",
+            "value": "PartnerLastName",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Name.FamilyNamePartnerPrefix",
+            "mode": "field",
+            "value": "PartnerPrefix",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Name.FamilyNamePrefix",
+            "mode": "field",
+            "value": "Person_Prefix_11020722",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Name.Initials",
+            "mode": "field",
+            "value": "Person_Initials_5",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Name.NickName",
+            "mode": "field",
+            "value": "Person_FirstName_2",
+            "validation": {
+                "required": true
+            }
+        }
+    ],
+    "contractMappings": [
+        {
+            "name": "CostCenter.ExternalId",
+            "mode": "field",
+            "value": "Component_KPL",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "CostCenter.Name",
+            "mode": "field",
+            "value": "Component_KPL",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Details.HoursPerWeek",
+            "mode": "field",
+            "value": "Component_HM_UREN_MIN",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Employer.ExternalId",
+            "mode": "field",
+            "value": "Employment_Company_33",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Employer.Name",
+            "mode": "field",
+            "value": "Employment_Company_33",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "EndDate",
+            "mode": "complex",
+            "value": "function getEndDate() {\r\n    if (sourceContract.Employment_EndDate_13) {\r\n        return sourceContract.Employment_EndDate_13\r\n    } else if (sourceContract.Formation_EndDate_22) {\r\n        return sourceContract.Formation_EndDate_22\r\n    } else {\r\n        return\r\n    }\r\n}\r\n\r\ngetEndDate();",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "ExternalId",
+            "mode": "complex",
+            "value": "function getExternalId() {\r\n    if (sourceContract.Employment_EmploymentNumber_2) {\r\n        return sourceContract.Employment_EmploymentNumber_2\r\n    } else if (sourceContract.ContractExternalId) {\r\n        return sourceContract.ContractExternalId\r\n    } else {\r\n        return\r\n    }\r\n}\r\n\r\ngetExternalId();",
+            "validation": {
+                "required": true
+            }
+        },
+        {
+            "name": "Manager.ExternalId",
+            "mode": "field",
+            "value": "Person_Manager",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Organization.ExternalId",
+            "mode": "field",
+            "value": "Component_BDR",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Organization.Name",
+            "mode": "field",
+            "value": "Component_BDR",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "StartDate",
+            "mode": "complex",
+            "value": "function getStartDate() {\r\n    if (sourceContract.Employment_StartDate_12) {\r\n        return sourceContract.Employment_StartDate_12\r\n    } else if (sourceContract.Formation_StartDate_21) {\r\n        return sourceContract.Formation_StartDate_21\r\n    } else {\r\n        return\r\n    }\r\n}\r\n\r\ngetStartDate();",
+            "validation": {
+                "required": true
+            }
+        },
+        {
+            "name": "Title.ExternalId",
+            "mode": "complex",
+            "value": "function getFunctionExternalId() {\r\n    if (sourceContract.Component_FUNCTIE) {\r\n        return sourceContract.Component_FUNCTIE\r\n    } else if (sourceContract.Formation_FunctionCode_1) {\r\n        return sourceContract.Formation_FunctionCode_1\r\n    } else {\r\n        return\r\n    }\r\n}\r\n\r\ngetFunctionExternalId();",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Title.Name",
+            "mode": "complex",
+            "value": "function getFunctionName() {\r\n    if (sourceContract.Component_FUNCTIE) {\r\n        return sourceContract.Component_FUNCTIE\r\n    } else if (sourceContract.Formation_FunctionCode_1) {\r\n        return sourceContract.Formation_FunctionCode_1\r\n    } else {\r\n        return\r\n    }\r\n}\r\n\r\ngetFunctionName();",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Type.Code",
+            "mode": "field",
+            "value": "TypeCode",
+            "validation": {
+                "required": false
+            }
+        },
+        {
+            "name": "Type.Description",
+            "mode": "field",
+            "value": "TypeDescription",
+            "validation": {
+                "required": false
+            }
+        }
+    ]
+}
