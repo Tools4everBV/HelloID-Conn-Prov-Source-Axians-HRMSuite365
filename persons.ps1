@@ -8,6 +8,8 @@ $config = $configuration | ConvertFrom-Json
 $contractRetentionPeriod = (Get-Date).AddDays( - [int]$($config.HistoricalDays)).ToString('yyyy-MM-dd')
 $contractFuturePeriod = (Get-Date).AddDays([int]$($config.FutureDays)).ToString('yyyy-MM-dd')
 $today = (Get-Date).ToString('yyyy-MM-dd')
+$countExportedPersons = 0
+$countSkippedPersons = 0
 
 $translationPersonMapping = @{
     '1'        = 'Person_ExternalId_1'
@@ -120,6 +122,10 @@ function Invoke-MercashFuncGetPageData {
         [string]
         $webPage,
 
+        [Parameter(Mandatory)]
+        [pscredential]
+        $credential,
+
         [Parameter()]
         [hashtable]
         $FieldTranslation = @{},
@@ -129,8 +135,6 @@ function Invoke-MercashFuncGetPageData {
         $employeeNr = $null
     )
     try {
-        $securePassword = ConvertTo-SecureString -String $config.Password -AsPlainText -Force
-        $credential = [pscredential]::new($config.Username, $securePassword)
         $webPageXml = $webPage
         $employeeXml = $employeeNr
 
@@ -201,9 +205,15 @@ function Invoke-MercashFuncGetPageData {
 #endregion
 
 try {
+    $actionMessage = 'creating credential object'
+    $securePassword = ConvertTo-SecureString -String $config.Password -AsPlainText -Force
+    $credential = [pscredential]::new($config.Username, $securePassword)
+
+
     $actionMessage = 'retrieving persons from Mercash'
     $splatParmGetEmployee = @{
         webPage          = 'EXT_WERK'
+        credential       = $credential
         FieldTranslation = $translationPersonMapping
         # employeeNr       = '1234' # Debug 1 person
     }
@@ -215,6 +225,7 @@ try {
     $actionMessage = 'retrieving partners from Mercash'
     $splatParmGetPartners = @{
         webPage          = 'EXT_PART'
+        credential       = $credential
         FieldTranslation = $translationPartnerMapping
         # employeeNr       = '1234' # Debug 1 person
     }
@@ -230,6 +241,7 @@ try {
     $actionMessage = 'retrieving employments from Mercash'
     $splatParmGetEmployments = @{
         webPage          = 'EXT_DVB'
+        credential       = $credential
         FieldTranslation = $translationEmploymentMapping
         # employeeNr       = '1234' # Debug 1 person
     }
@@ -242,7 +254,12 @@ try {
     $employmentsFiltered | Add-Member -MemberType NoteProperty -Name "ContractExternalId" -Value $null -Force
     $employmentsFiltered | Add-Member -MemberType NoteProperty -Name "TypeCode" -Value '1' -Force
     $employmentsFiltered | Add-Member -MemberType NoteProperty -Name "TypeDescription" -Value 'Employment' -Force
-    $employmentsGrouped = $employmentsFiltered | Group-Object -Property Employment_ExternalId_1 -AsHashTable
+    if (-not [string]::IsNullOrEmpty($employmentsFiltered) ) {
+        $employmentsGrouped = $employmentsFiltered | Group-Object -Property Employment_ExternalId_1 -AsHashTable
+    }
+    else {
+        $employmentsGrouped = @{}
+    }
     # Clean memory
     $employmentsUnfiltered = $null
     $employmentsFiltered = $null
@@ -251,6 +268,7 @@ try {
     $actionMessage = "retrieving formations from Mercash"
     $splatParmGetFormation = @{
         webPage          = 'EXT_FORM'
+        credential       = $credential
         FieldTranslation = $translationFormationMapping
         # employeeNr       = '1234' # Debug 1 person
     }      
@@ -262,7 +280,13 @@ try {
     $formationsFiltered | Add-Member -MemberType NoteProperty -Name "ContractExternalId" -Value $null -Force
     $formationsFiltered | Add-Member -MemberType NoteProperty -Name "TypeCode" -Value '2' -Force
     $formationsFiltered | Add-Member -MemberType NoteProperty -Name "TypeDescription" -Value 'Formation' -Force
-    $formationsGrouped = $formationsFiltered | Group-Object -Property Formation_ExternalId_12 -AsHashTable
+    if (-not [string]::IsNullOrEmpty($formationsGrouped) ) {
+        $formationsGrouped = $formationsFiltered | Group-Object -Property Formation_ExternalId_12 -AsHashTable
+    }
+    else {
+        $formationsGrouped = @{}
+    }
+    
     Write-Information "Formations retrieved: $($formationsFiltered.Count) (filtered by retention period future [$($config.FutureDays)] and historical [$($config.HistoricalDays)])"
     # Clean memory
     $formationsUnfiltered = $null
@@ -303,12 +327,13 @@ try {
         $actionMessage = "retrieving person components for person with ExternalId [$($person.ExternalId)]"
         $splatParmGetComponentW = @{
             webPage          = 'EXT_COMP_W'
+            credential       = $credential
             FieldTranslation = $translationPersonComponentMapping
             employeeNr       = $person.ExternalId
         }
 
         $personComponents = Invoke-MercashFuncGetPageData @splatParmGetComponentW
-        $personComponents = $personComponents | Where-Object { $_.Component_Value_21 -ne $null }
+        $personComponents = $personComponents | Where-Object { -not [string]::IsNullOrEmpty($_.Component_Value_21) }
 
         if ($null -ne $personComponents) {
             $groupedComponents = $personComponents | Group-Object -Property Component_FieldName_7
@@ -329,12 +354,13 @@ try {
         $actionMessage = "retrieving employment components for person with ExternalId [$($person.ExternalId)]"
         $splatParmGetComponents = @{
             webPage          = 'EXT_COMP'
+            credential       = $credential
             FieldTranslation = $translationEmploymentComponentMapping
             employeeNr       = $person.ExternalId
         }      
         
         $employmentsComponents = Invoke-MercashFuncGetPageData @splatParmGetComponents
-        $employmentsComponents = $employmentsComponents | Where-Object { $_.Component_Value_21 -ne $null }
+        $employmentsComponents = $employmentsComponents | Where-Object { -not [string]::IsNullOrEmpty($_.Component_Value_21) }
 
         $actionMessage = "enhancing employments for person with ExternalId [$($person.ExternalId)]"
         foreach ($employment in $employments) {
@@ -370,10 +396,10 @@ try {
 
         $person.Contracts = $contractsList
         Write-Output $person | ConvertTo-Json -Depth 10
-        $exportedPersons++
+        $countExportedPersons++
     }
 
-    write-Information "Persons retrieved: $exportedPersons"
+    write-Information "Persons retrieved: $countExportedPersons"
     Write-Information "Persons skipped: $countSkippedPersons (because no employments found)"
 }
 catch {
